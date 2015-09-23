@@ -43,10 +43,12 @@ static CLImageEditorTheme *_sharedInstance = nil;
     self = [super init];
     if (self) {
         self.bundleName                     = @"CLImageEditor";
-        self.backgroundColor                = [UIColor colorWithWhite:0.05f alpha:1.0f];//[UIColor whiteColor];
-        self.toolbarColor                   = [UIColor blackColor];//[UIColor colorWithWhite:1 alpha:0.8];
-        self.toolIconColor                  = @"leonard-blue";//@"black";
-        self.toolbarTextColor               = [UIColor colorWithRed:((float)0x54/(float)0xff) green:((float)0xbd/(float)0xff) blue:((float)0xff/(float)0xff) alpha:1.0f];//[UIColor blackColor];
+        self.backgroundColor                = [UIColor colorWithWhite:0.05f alpha:1.0f];
+        self.navigationBarStyle             = UIBarStyleBlack;
+        self.navigationBarTintColor         = [UIColor colorWithRed:((float)0x54/(float)0xff) green:((float)0xbd/(float)0xff) blue:((float)0xff/(float)0xff) alpha:1.0f];
+        self.toolbarColor                   = [UIColor blackColor];
+        self.toolIconColor                  = @"leonard-blue";
+        self.toolbarTextColor               = [UIColor colorWithRed:((float)0x54/(float)0xff) green:((float)0xbd/(float)0xff) blue:((float)0xff/(float)0xff) alpha:1.0f];
         self.toolbarSelectedButtonColor     = [[UIColor whiteColor] colorWithAlphaComponent:0.2];
         self.toolbarTextFont                = [UIFont systemFontOfSize:10];
         self.statusBarStyle                 = UIStatusBarStyleDefault;

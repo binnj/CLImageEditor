@@ -78,6 +78,7 @@
 
 - (void)initNavigationBar
 {
+    CLImageEditorTheme *theme = [CLImageEditorTheme theme];
     UIBarButtonItem *rightBarButtonItem = nil;
     NSString *doneBtnTitle = [CLImageEditorTheme localizedString:@"CLImageEditor_DoneBtnTitle" withDefault:nil];
     
@@ -101,13 +102,16 @@
         UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, dy, self.view.width, 44)];
         [navigationBar pushNavigationItem:navigationItem animated:NO];
         navigationBar.delegate = self;
-        navigationBar.barTintColor = [UIColor blackColor];
-        navigationBar.tintColor = [UIColor colorWithRed:((float)0x54/(float)0xff) green:((float)0xbd/(float)0xff) blue:((float)0xff/(float)0xff) alpha:1.0f];
-        [navigationBar setTitleTextAttributes:@{
-                                                NSForegroundColorAttributeName: [UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0],
-                                                NSBackgroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.8],
-                                                NSFontAttributeName: [UIFont fontWithName:@"Arial-Bold" size:0.0],
-                                                }];
+        navigationBar.barStyle = theme.navigationBarStyle;
+        if (theme.navigationBarBarTintColor) {
+            navigationBar.barTintColor = theme.navigationBarBarTintColor;
+        }
+        if (theme.navigationBarTintColor) {
+            navigationBar.tintColor = theme.navigationBarTintColor;
+        }
+        if (theme.navigationBarTitleTextAttributes) {
+            [navigationBar setTitleTextAttributes:theme.navigationBarTitleTextAttributes];
+        }
 
         if(self.navigationController){
             [self.navigationController.view addSubview:navigationBar];
