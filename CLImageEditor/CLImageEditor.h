@@ -20,6 +20,7 @@
 @property (nonatomic, weak) id<CLImageEditorDelegate> delegate;
 @property (nonatomic, readonly) CLImageEditorTheme *theme;
 @property (nonatomic, readonly) CLImageToolInfo *toolInfo;
+@property (nonatomic, assign) UIInterfaceOrientationMask parentInterfaceOrientationMask; // NOTE: UI does NOT support Rotation!!
 
 - (id)initWithImage:(UIImage*)image;
 - (id)initWithImage:(UIImage*)image delegate:(id<CLImageEditorDelegate>)delegate;
