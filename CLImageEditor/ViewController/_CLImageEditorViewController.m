@@ -202,17 +202,14 @@
     [self refreshImageView];
 }
 
-- (void) presentCropOnlyInterfaceInViewController:(UIViewController *)controller withImageView:(UIImageView *)imageView
+- (void) presentAvatarCropOnlyInterface
 {
     self.singleToolEditMode = YES;
     self.hideBottomToolbar = YES;
-    [self showInViewController:controller withImageView:imageView];
     CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
         return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
     }]].firstObject;
     [self setupToolWithToolInfo:toolInfo];
-    CLClippingTool *clipper = self.currentTool;
-    
 }
 
 - (void)viewDidLoad
@@ -601,16 +598,17 @@
 {
     [self swapMenuViewWithEditting:editting];
     [self swapNavigationBarWithEditting:editting];
-    
-    if (self.singleToolEditMode) {
-        return;
-    }
-    
+        
     if(self.currentTool){
         UINavigationItem *item  = [[UINavigationItem alloc] initWithTitle:self.currentTool.toolInfo.title];
-        item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedDoneBtn:)];
-        item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_BackBtnTitle" withDefault:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(pushedCancelBtn:)];
-        
+        if (self.singleToolEditMode) {
+            item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedFinishBtn:)];
+            item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(pushedCloseBtn:)];
+        }
+        else {
+            item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedDoneBtn:)];
+            item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_BackBtnTitle" withDefault:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(pushedCancelBtn:)];
+        }
         [_navigationBar pushNavigationItem:item animated:(self.navigationController==nil)];
     }
     else{
