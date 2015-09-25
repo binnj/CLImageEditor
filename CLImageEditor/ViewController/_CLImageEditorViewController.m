@@ -19,6 +19,7 @@
 @property (nonatomic, strong, readwrite) CLImageToolInfo *toolInfo;
 @property (nonatomic, strong) UIImageView *targetImageView;
 @property (nonatomic, assign) BOOL singleToolEditMode;
+@property (nonatomic, assign) BOOL avatarEditingMode;
 @property (nonatomic, assign) BOOL hideBottomToolbar;
 
 @end
@@ -205,6 +206,7 @@
 - (void) presentAvatarCropOnlyInterface
 {
     self.singleToolEditMode = YES;
+    self.avatarEditingMode = YES;
     self.hideBottomToolbar = YES;
     CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
         return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
@@ -628,6 +630,7 @@
             CLImageToolBase *tool = (CLImageToolBase *)instance;
             tool = [tool initWithImageEditor:self withToolInfo:info];
             tool.singleToolEditMode = self.singleToolEditMode;
+            tool.avatarEditingMode = self.avatarEditingMode;
             self.currentTool = tool;
         }
     }

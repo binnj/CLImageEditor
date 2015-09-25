@@ -103,14 +103,14 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     if(!self.toolInfo.optionalInfo){
         self.toolInfo.optionalInfo = [[self.class optionalInfo] mutableCopy];
     }
-    if (self.singleToolEditMode) {
+    if (self.avatarEditingMode) {
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
     }
     
-    BOOL swapBtnHidden = [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
+    BOOL swapBtnHidden = (self.avatarEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
-    if (self.singleToolEditMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
+    if (self.avatarEditingMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
         CGRect frame = self.editor.menuView.frame;
         self.editor.menuView.frame = CGRectMake(frame.origin.x,frame.origin.y+frame.size.height,frame.size.width,0);
     }
@@ -118,24 +118,27 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
     
-    _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
-    _menuScroll.backgroundColor = [UIColor clearColor];
-    _menuScroll.showsHorizontalScrollIndicator = NO;
-    _menuScroll.clipsToBounds = NO;
-    [_menuContainer addSubview:_menuScroll];
-    
-    if(!swapBtnHidden){
-        UIView *btnPanel = [[UIView alloc] initWithFrame:CGRectMake(_menuScroll.right, 0, buttonWidth, _menuContainer.height)];
-        btnPanel.backgroundColor = [_menuContainer.backgroundColor colorWithAlphaComponent:0.9];
-        [_menuContainer addSubview:btnPanel];
+    if (!self.avatarEditingMode || ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
         
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn.frame = CGRectMake(0, 0, 40, 40);
-        btn.center = CGPointMake(btnPanel.width/2, btnPanel.height/2 - 10);
-        [btn addTarget:self action:@selector(pushedRotateBtn:) forControlEvents:UIControlEventTouchUpInside];
-        [btn setImage:[self imageForKey:kCLClippingToolRotateIconName defaultImageName:@"btn_rotate.png"] forState:UIControlStateNormal];
-        btn.adjustsImageWhenHighlighted = YES;
-        [btnPanel addSubview:btn];
+        _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
+        _menuScroll.backgroundColor = [UIColor clearColor];
+        _menuScroll.showsHorizontalScrollIndicator = NO;
+        _menuScroll.clipsToBounds = NO;
+        [_menuContainer addSubview:_menuScroll];
+        
+        if(!swapBtnHidden){
+            UIView *btnPanel = [[UIView alloc] initWithFrame:CGRectMake(_menuScroll.right, 0, buttonWidth, _menuContainer.height)];
+            btnPanel.backgroundColor = [_menuContainer.backgroundColor colorWithAlphaComponent:0.9];
+            [_menuContainer addSubview:btnPanel];
+            
+            UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+            btn.frame = CGRectMake(0, 0, 40, 40);
+            btn.center = CGPointMake(btnPanel.width/2, btnPanel.height/2 - 10);
+            [btn addTarget:self action:@selector(pushedRotateBtn:) forControlEvents:UIControlEventTouchUpInside];
+            [btn setImage:[self imageForKey:kCLClippingToolRotateIconName defaultImageName:@"btn_rotate.png"] forState:UIControlStateNormal];
+            btn.adjustsImageWhenHighlighted = YES;
+            [btnPanel addSubview:btn];
+        }
     }
     
     _gridView = [[CLClippingPanel alloc] initWithSuperview:self.editor.imageView.superview frame:self.editor.imageView.frame];
