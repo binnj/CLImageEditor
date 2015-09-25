@@ -527,7 +527,9 @@
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    return UIInterfaceOrientationMaskPortrait;
+    return (self.parentInterfaceOrientationMask != 0
+            ? self.parentInterfaceOrientationMask
+            : UIInterfaceOrientationMaskPortrait);
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
