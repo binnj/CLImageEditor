@@ -26,6 +26,7 @@
 - (id)initWithDelegate:(id<CLImageEditorDelegate>)delegate;
 
 - (void)showInViewController:(UIViewController<CLImageEditorTransitionDelegate>*)controller withImageView:(UIImageView*)imageView;
+- (void) presentCropOnlyInterfaceInViewController:(UIViewController *)controller withImageView:(UIImageView *)imageView;
 
 @end
 

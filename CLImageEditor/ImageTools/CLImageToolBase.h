@@ -22,6 +22,7 @@ static const CGFloat kCLImageToolFadeoutDuration   = 0.2;
 }
 @property (nonatomic, weak) _CLImageEditorViewController *editor;
 @property (nonatomic, weak) CLImageToolInfo *toolInfo;
+@property (nonatomic, assign) BOOL singleToolEditMode;
 
 - (id)initWithImageEditor:(_CLImageEditorViewController*)editor withToolInfo:(CLImageToolInfo*)info;
 

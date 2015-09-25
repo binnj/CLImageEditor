@@ -8,6 +8,7 @@
 #import "_CLImageEditorViewController.h"
 
 #import "CLImageToolBase.h"
+#import "CLClippingTool.h"
 
 
 #pragma mark- _CLImageEditorViewController
@@ -17,6 +18,9 @@
 @property (nonatomic, strong) CLImageToolBase *currentTool;
 @property (nonatomic, strong, readwrite) CLImageToolInfo *toolInfo;
 @property (nonatomic, strong) UIImageView *targetImageView;
+@property (nonatomic, assign) BOOL singleToolEditMode;
+@property (nonatomic, assign) BOOL hideBottomToolbar;
+
 @end
 
 
@@ -138,7 +142,7 @@
 
 - (void)initMenuScrollView
 {
-    if(self.menuView==nil){
+    if(self.menuView==nil && !self.hideBottomToolbar){
         UIScrollView *menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 80)];
         menuScroll.top = self.view.height - menuScroll.height;
         menuScroll.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
@@ -182,7 +186,7 @@
 
 #pragma mark-
 
-- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView;
+- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView
 {
     _originalImage = imageView.image;
     
@@ -193,7 +197,22 @@
     
     self.view.frame = controller.view.bounds;
     [controller.view addSubview:self.view];
+    CGRect viewFrame = self.view.frame;
+    _navigationBar.frame = CGRectMake(0, 0, viewFrame.size.width, _navigationBar.bounds.size.height);
     [self refreshImageView];
+}
+
+- (void) presentCropOnlyInterfaceInViewController:(UIViewController *)controller withImageView:(UIImageView *)imageView
+{
+    self.singleToolEditMode = YES;
+    self.hideBottomToolbar = YES;
+    [self showInViewController:controller withImageView:imageView];
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
+    CLClippingTool *clipper = self.currentTool;
+    
 }
 
 - (void)viewDidLoad
@@ -581,6 +600,10 @@
     [self swapMenuViewWithEditting:editting];
     [self swapNavigationBarWithEditting:editting];
     
+    if (self.singleToolEditMode) {
+        return;
+    }
+    
     if(self.currentTool){
         UINavigationItem *item  = [[UINavigationItem alloc] initWithTitle:self.currentTool.toolInfo.title];
         item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedDoneBtn:)];
@@ -602,8 +625,10 @@
     if(toolClass){
         id instance = [toolClass alloc];
         if(instance!=nil && [instance isKindOfClass:[CLImageToolBase class]]){
-            instance = [instance initWithImageEditor:self withToolInfo:info];
-            self.currentTool = instance;
+            CLImageToolBase *tool = (CLImageToolBase *)instance;
+            tool = [tool initWithImageEditor:self withToolInfo:info];
+            tool.singleToolEditMode = self.singleToolEditMode;
+            self.currentTool = tool;
         }
     }
 }
@@ -668,6 +693,9 @@
 
 - (void)pushedFinishBtn:(id)sender
 {
+    if (self.singleToolEditMode) {
+        [self pushedDoneBtn:sender];
+    }
     if(self.targetImageView==nil){
         if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEdittingWithImage:)]){
             [self.delegate imageEditor:self didFinishEdittingWithImage:_originalImage];

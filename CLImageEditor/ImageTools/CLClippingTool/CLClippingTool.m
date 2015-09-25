@@ -72,11 +72,11 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 + (NSArray*)defaultPresetRatios
 {
     return @[
-             @{kCLClippingToolRatioValue1:@0, kCLClippingToolRatioValue2:@0, kCLClippingToolRatioTitleFormat:[CLImageEditorTheme localizedString:@"CLClippingTool_ItemMenuCustom" withDefault:@"Custom"]},
+//             @{kCLClippingToolRatioValue1:@0, kCLClippingToolRatioValue2:@0, kCLClippingToolRatioTitleFormat:[CLImageEditorTheme localizedString:@"CLClippingTool_ItemMenuCustom" withDefault:@"Custom"]},
              @{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"},
-             @{kCLClippingToolRatioValue1:@4, kCLClippingToolRatioValue2:@3, kCLClippingToolRatioTitleFormat:@"%g : %g"},
-             @{kCLClippingToolRatioValue1:@3, kCLClippingToolRatioValue2:@2, kCLClippingToolRatioTitleFormat:@"%g : %g"},
-             @{kCLClippingToolRatioValue1:@16, kCLClippingToolRatioValue2:@9, kCLClippingToolRatioTitleFormat:@"%g : %g"},
+//             @{kCLClippingToolRatioValue1:@4, kCLClippingToolRatioValue2:@3, kCLClippingToolRatioTitleFormat:@"%g : %g"},
+//             @{kCLClippingToolRatioValue1:@3, kCLClippingToolRatioValue2:@2, kCLClippingToolRatioTitleFormat:@"%g : %g"},
+//             @{kCLClippingToolRatioValue1:@16, kCLClippingToolRatioValue2:@9, kCLClippingToolRatioTitleFormat:@"%g : %g"},
              ];
 }
 
@@ -107,6 +107,10 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     BOOL swapBtnHidden = [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
+    if (self.singleToolEditMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
+        CGRect frame = self.editor.menuView.frame;
+        self.editor.menuView.frame = CGRectMake(frame.origin.x,frame.origin.y+frame.size.height,frame.size.width,0);
+    }
     _menuContainer = [[UIView alloc] initWithFrame:self.editor.menuView.frame];
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
