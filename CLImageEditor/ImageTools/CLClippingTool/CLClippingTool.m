@@ -110,7 +110,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     BOOL swapBtnHidden = (self.avatarEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
-    if (self.avatarEditingMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
+    if (self.singleToolEditMode && self.avatarEditingMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
         CGRect frame = self.editor.menuView.frame;
         self.editor.menuView.frame = CGRectMake(frame.origin.x,frame.origin.y+frame.size.height,frame.size.width,0);
     }

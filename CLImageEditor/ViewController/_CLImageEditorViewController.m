@@ -19,7 +19,6 @@
 @property (nonatomic, strong, readwrite) CLImageToolInfo *toolInfo;
 @property (nonatomic, strong) UIImageView *targetImageView;
 @property (nonatomic, assign) BOOL singleToolEditMode;
-@property (nonatomic, assign) BOOL avatarEditingMode;
 @property (nonatomic, assign) BOOL hideBottomToolbar;
 
 @end
