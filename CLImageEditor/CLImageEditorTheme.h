@@ -31,6 +31,7 @@
 @property (nonatomic, strong) UIColor  *toolbarSelectedButtonColor;
 @property (nonatomic, strong) UIFont   *toolbarTextFont;
 @property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
+@property (nonatomic, strong) UIColor  *avatarCircleColor;
 
 + (CLImageEditorTheme*)theme;
 

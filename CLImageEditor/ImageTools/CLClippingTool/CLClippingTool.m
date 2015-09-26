@@ -6,7 +6,7 @@
 //
 
 #import "CLClippingTool.h"
-
+#import "CLImageEditorTheme.h"
 
 static NSString* const kCLClippingToolRatios = @"ratios";
 static NSString* const kCLClippingToolSwapButtonHidden = @"swapButtonHidden";
@@ -36,6 +36,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @interface CLClippingPanel : UIView
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) CLRatio *clippingRatio;
+@property (nonatomic, assign) BOOL avatarEditingMode;
 - (id)initWithSuperview:(UIView*)superview frame:(CGRect)frame;
 - (void)setBgColor:(UIColor*)bgColor;
 - (void)setGridColor:(UIColor*)gridColor;
@@ -146,6 +147,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _gridView.bgColor = [self.editor.view.backgroundColor colorWithAlphaComponent:0.8];
     _gridView.gridColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
     _gridView.clipsToBounds = NO;
+    _gridView.avatarEditingMode = self.avatarEditingMode;
     
     [self setCropMenu];
     
@@ -303,6 +305,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, strong) UIColor *gridColor;
+@property (nonatomic, assign) BOOL avatarEditingMode;
 @end
 
 @implementation CLGridLayar
@@ -332,7 +335,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
     CGContextFillRect(context, rct);
     
-    CGContextClearRect(context, _clippingRect);
+    CGContextClearRect(context, _clippingRect);    
     
     CGContextSetStrokeColorWithColor(context, self.gridColor.CGColor);
     CGContextSetLineWidth(context, 1);
@@ -354,6 +357,14 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
         dW += rct.size.height/3;
     }
     CGContextStrokePath(context);
+    
+    if (self.avatarEditingMode) {
+        CGContextSetStrokeColorWithColor(context, [CLImageEditorTheme theme].avatarCircleColor.CGColor);
+        CGContextSetLineWidth(context, 3);
+        CGContextBeginPath(context);
+        CGContextAddEllipseInRect(context, rct);
+        CGContextStrokePath(context);
+    }
 }
 
 @end
@@ -415,6 +426,12 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     [_lbView removeFromSuperview];
     [_rtView removeFromSuperview];
     [_rbView removeFromSuperview];
+}
+
+- (void) setAvatarEditingMode:(BOOL)avatarEditingMode
+{
+    _avatarEditingMode = avatarEditingMode;
+    _gridLayer.avatarEditingMode = avatarEditingMode;
 }
 
 - (void)setBgColor:(UIColor *)bgColor
