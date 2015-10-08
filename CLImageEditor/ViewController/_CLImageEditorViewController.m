@@ -466,8 +466,10 @@
 - (void)fixZoomScaleWithAnimated:(BOOL)animated
 {
     CGFloat minZoomScale = _scrollView.minimumZoomScale;
-    _scrollView.maximumZoomScale = 0.95*minZoomScale;
-    _scrollView.minimumZoomScale = 0.95*minZoomScale;
+    if (!self.avatarEditingMode){ //enable zoom when not avatar
+        _scrollView.maximumZoomScale = 0.95*minZoomScale;
+        _scrollView.minimumZoomScale = 0.95*minZoomScale;
+    }
     [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:animated];
 }
 
@@ -482,8 +484,10 @@
     Rh = MAX(Rh, _imageView.image.size.height / (scale * _scrollView.frame.size.height));
     
     _scrollView.contentSize = _imageView.frame.size;
-    _scrollView.minimumZoomScale = 1;
-    _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
+    if (!self.avatarEditingMode){//enable zoom when not avatar
+        _scrollView.minimumZoomScale = 1;
+        _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
+    }
     
     [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:animated];
 }
