@@ -466,6 +466,10 @@
         x += W+padding;
     }
     _menuView.contentSize = CGSizeMake(MAX(x, _menuView.frame.size.width+1), 0);
+    if (self.centreTopLevelTools) {
+        _menuView.contentOffset = CGPointMake((x-_menuView.frame.size.width)/2.0f, 0.0f);
+        _menuView.scrollEnabled = NO;
+    }
 }
 
 - (void)resetImageViewFrame

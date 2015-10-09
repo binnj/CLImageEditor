@@ -22,6 +22,7 @@
 @property (nonatomic, readonly) CLImageToolInfo *toolInfo;
 @property (nonatomic, assign) UIInterfaceOrientationMask parentInterfaceOrientationMask; // NOTE: UI does NOT support Rotation!!
 @property (nonatomic, assign) BOOL avatarEditingMode;
+@property (nonatomic, assign) BOOL centreTopLevelTools;
 
 - (id)initWithImage:(UIImage*)image;
 - (id)initWithImage:(UIImage*)image delegate:(id<CLImageEditorDelegate>)delegate;
