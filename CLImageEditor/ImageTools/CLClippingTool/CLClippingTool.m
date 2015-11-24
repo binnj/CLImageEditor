@@ -37,6 +37,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) CLRatio *clippingRatio;
 @property (nonatomic, assign) BOOL avatarEditingMode;
+@property (nonatomic, assign) BOOL chequeEditingMode;
 - (id)initWithSuperview:(UIView*)superview frame:(CGRect)frame;
 - (void)setBgColor:(UIColor*)bgColor;
 - (void)setGridColor:(UIColor*)gridColor;
@@ -107,8 +108,12 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     if (self.avatarEditingMode) {
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
     }
+    if (self.chequeEditingMode){
+        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@16, kCLClippingToolRatioValue2:@9, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
+        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
+    }
     
-    BOOL swapBtnHidden = (self.avatarEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
+    BOOL swapBtnHidden = (self.avatarEditingMode || self.chequeEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
     if (self.singleToolEditMode && self.avatarEditingMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
@@ -119,7 +124,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
     
-    if (!self.avatarEditingMode || ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
+    if (!(self.avatarEditingMode || self.chequeEditingMode) ||  ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
         
         _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
         _menuScroll.backgroundColor = [UIColor clearColor];
@@ -148,6 +153,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _gridView.gridColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
     _gridView.clipsToBounds = NO;
     _gridView.avatarEditingMode = self.avatarEditingMode;
+    _gridView.chequeEditingMode = self.chequeEditingMode;
     
     [self setCropMenu];
     
@@ -306,6 +312,8 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, strong) UIColor *gridColor;
 @property (nonatomic, assign) BOOL avatarEditingMode;
+@property (nonatomic, assign) BOOL chequeEditingMode;
+
 @end
 
 @implementation CLGridLayar
@@ -432,6 +440,12 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 {
     _avatarEditingMode = avatarEditingMode;
     _gridLayer.avatarEditingMode = avatarEditingMode;
+}
+
+- (void) setChequeEditingMode:(BOOL)chequeEditingMode
+{
+    _avatarEditingMode = chequeEditingMode;
+    _gridLayer.avatarEditingMode = chequeEditingMode;
 }
 
 - (void)setBgColor:(UIColor *)bgColor

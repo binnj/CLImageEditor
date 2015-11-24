@@ -202,10 +202,23 @@
     [self refreshImageView];
 }
 
+- (void) presentChequeCropOnlyInterface
+{
+    self.singleToolEditMode = YES;
+    self.avatarEditingMode = NO;
+    self.chequeEditingMode = YES;
+    self.hideBottomToolbar = YES;
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
+}
+
 - (void) presentAvatarCropOnlyInterface
 {
     self.singleToolEditMode = YES;
     self.avatarEditingMode = YES;
+    self.chequeEditingMode = NO;
     self.hideBottomToolbar = YES;
     CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
         return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
@@ -638,6 +651,7 @@
             tool = [tool initWithImageEditor:self withToolInfo:info];
             tool.singleToolEditMode = self.singleToolEditMode;
             tool.avatarEditingMode = self.avatarEditingMode;
+            tool.chequeEditingMode = self.chequeEditingMode;
             self.currentTool = tool;
         }
     }
