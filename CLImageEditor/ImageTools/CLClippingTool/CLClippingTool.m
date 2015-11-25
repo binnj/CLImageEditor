@@ -109,11 +109,11 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
     }
     if (self.chequeEditingMode){
-        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@16, kCLClippingToolRatioValue2:@9, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
+        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@458, kCLClippingToolRatioValue2:@197, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
         self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
     }
     
-    BOOL swapBtnHidden = (self.avatarEditingMode || self.chequeEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
+    BOOL swapBtnHidden = (self.avatarEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
     if (self.singleToolEditMode && self.avatarEditingMode && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
@@ -124,7 +124,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
     
-    if (!(self.avatarEditingMode || self.chequeEditingMode) ||  ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
+    if (!self.avatarEditingMode ||  ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
         
         _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
         _menuScroll.backgroundColor = [UIColor clearColor];
@@ -444,8 +444,8 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 
 - (void) setChequeEditingMode:(BOOL)chequeEditingMode
 {
-    _avatarEditingMode = chequeEditingMode;
-    _gridLayer.avatarEditingMode = chequeEditingMode;
+    _chequeEditingMode = chequeEditingMode;
+    _gridLayer.chequeEditingMode = chequeEditingMode;
 }
 
 - (void)setBgColor:(UIColor *)bgColor
