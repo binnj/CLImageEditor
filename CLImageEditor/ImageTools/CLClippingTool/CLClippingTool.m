@@ -108,7 +108,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     if (self.avatarEditingMode) {
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
     }
-    if (self.chequeEditingMode){
+    else if (self.chequeEditingMode){
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@458, kCLClippingToolRatioValue2:@197, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
         self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
     }
