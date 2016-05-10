@@ -206,6 +206,19 @@
 {
     self.singleToolEditMode = YES;
     self.avatarEditingMode = YES;
+    self.storefrontEditingMode = NO;
+    self.hideBottomToolbar = YES;
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
+}
+
+- (void) presentStorefrontCropOnlyInterface
+{
+    self.singleToolEditMode = YES;
+    self.avatarEditingMode = NO;
+    self.storefrontEditingMode = YES;
     self.hideBottomToolbar = YES;
     CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
         return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
@@ -487,7 +500,7 @@
 - (void)fixZoomScaleWithAnimated:(BOOL)animated
 {
     CGFloat minZoomScale = _scrollView.minimumZoomScale;
-    if (!self.avatarEditingMode){ //enable zoom when not avatar
+    if (!self.avatarEditingMode && !self.storefrontEditingMode){ //enable zoom when not avatar
         _scrollView.maximumZoomScale = 0.95*minZoomScale;
         _scrollView.minimumZoomScale = 0.95*minZoomScale;
     }
@@ -505,7 +518,7 @@
     Rh = MAX(Rh, _imageView.image.size.height / (scale * _scrollView.frame.size.height));
     
     _scrollView.contentSize = _imageView.frame.size;
-    if (!self.avatarEditingMode){//enable zoom when not avatar
+    if (!self.avatarEditingMode && !self.storefrontEditingMode){//enable zoom when not avatar
         _scrollView.minimumZoomScale = 1;
         _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
     }
@@ -638,6 +651,7 @@
             tool = [tool initWithImageEditor:self withToolInfo:info];
             tool.singleToolEditMode = self.singleToolEditMode;
             tool.avatarEditingMode = self.avatarEditingMode;
+            tool.storefrontEditingMode = self.storefrontEditingMode;
             self.currentTool = tool;
         }
     }
