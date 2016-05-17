@@ -21,8 +21,8 @@
 @property (nonatomic, readonly) CLImageEditorTheme *theme;
 @property (nonatomic, readonly) CLImageToolInfo *toolInfo;
 @property (nonatomic, assign) UIInterfaceOrientationMask parentInterfaceOrientationMask; // NOTE: UI does NOT support Rotation!!
-@property (nonatomic, assign) BOOL avatarEditingMode;
-@property (nonatomic, assign) BOOL storefrontEditingMode;
+@property (nonatomic, assign) NSNumber *cropWidth;
+@property (nonatomic, assign) NSNumber *cropHeight;
 @property (nonatomic, assign) BOOL centreTopLevelTools;
 
 - (id)initWithImage:(UIImage*)image;
@@ -30,8 +30,7 @@
 - (id)initWithDelegate:(id<CLImageEditorDelegate>)delegate;
 
 - (void)showInViewController:(UIViewController<CLImageEditorTransitionDelegate>*)controller withImageView:(UIImageView*)imageView;
-- (void) presentAvatarCropOnlyInterface;
-- (void) presentStorefrontCropOnlyInterface;
+- (void) presentCropOnlyInterfaceWithWidth:(NSNumber *)width andHeight:(NSNumber *)height;
 
 @end
 

@@ -36,8 +36,8 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @interface CLClippingPanel : UIView
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) CLRatio *clippingRatio;
-@property (nonatomic, assign) BOOL avatarEditingMode;
-@property (nonatomic, assign) BOOL storefrontEditingMode;
+@property (nonatomic, assign) NSNumber *cropWidth;
+@property (nonatomic, assign) NSNumber *cropHeight;
 - (id)initWithSuperview:(UIView*)superview frame:(CGRect)frame;
 - (void)setBgColor:(UIColor*)bgColor;
 - (void)setGridColor:(UIColor*)gridColor;
@@ -105,18 +105,15 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     if(!self.toolInfo.optionalInfo){
         self.toolInfo.optionalInfo = [[self.class optionalInfo] mutableCopy];
     }
-    if (self.avatarEditingMode) {
-        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@1, kCLClippingToolRatioValue2:@1, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
-    }
-    else if (self.storefrontEditingMode) {
-        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@25, kCLClippingToolRatioValue2:@12, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
+    if (self.cropWidth && self.cropHeight) {
+        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:self.cropWidth, kCLClippingToolRatioValue2:self.cropHeight, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
         self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
     }
     
-    BOOL swapBtnHidden = (self.avatarEditingMode || self.storefrontEditingMode || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue]);
+    BOOL swapBtnHidden = (self.cropHeight && self.cropWidth) || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
-    if (self.singleToolEditMode && (self.avatarEditingMode || self.storefrontEditingMode) && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
+    if (self.singleToolEditMode && self.cropWidth && self.cropHeight && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
         CGRect frame = self.editor.menuView.frame;
         self.editor.menuView.frame = CGRectMake(frame.origin.x,frame.origin.y+frame.size.height,frame.size.width,0);
     }
@@ -124,7 +121,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
     
-    if ((!self.avatarEditingMode && !self.storefrontEditingMode) || ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
+    if ((!self.cropWidth && !self.cropHeight) || ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
         
         _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
         _menuScroll.backgroundColor = [UIColor clearColor];
@@ -152,8 +149,8 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _gridView.bgColor = [self.editor.view.backgroundColor colorWithAlphaComponent:0.8];
     _gridView.gridColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
     _gridView.clipsToBounds = NO;
-    _gridView.avatarEditingMode = self.avatarEditingMode;
-    _gridView.storefrontEditingMode = self.storefrontEditingMode;
+    _gridView.cropWidth = self.cropWidth;
+    _gridView.cropHeight = self.cropHeight;
     
     [self setCropMenu];
     
@@ -447,18 +444,6 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     [_lbView removeFromSuperview];
     [_rtView removeFromSuperview];
     [_rbView removeFromSuperview];
-}
-
-- (void) setAvatarEditingMode:(BOOL)avatarEditingMode
-{
-    _avatarEditingMode = avatarEditingMode;
-    _gridLayer.avatarEditingMode = avatarEditingMode;
-}
-
-- (void) setStorefrontEditingMode:(BOOL)storefrontEditingMode
-{
-    _storefrontEditingMode = storefrontEditingMode;
-    _gridLayer.storefrontEditingMode = storefrontEditingMode;
 }
 
 - (void)setBgColor:(UIColor *)bgColor
