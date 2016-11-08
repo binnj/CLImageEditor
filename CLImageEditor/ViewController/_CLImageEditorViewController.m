@@ -217,6 +217,17 @@
     [self setupToolWithToolInfo:toolInfo];
 }
 
+- (void) presentChequeCropOnlyInterface
+{
+    self.singleToolEditMode = YES;
+    self.chequeEditingMode = YES;
+    self.hideBottomToolbar = YES;
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -491,7 +502,7 @@
 - (void)fixZoomScaleWithAnimated:(BOOL)animated
 {
     CGFloat minZoomScale = _scrollView.minimumZoomScale;
-    if (!self.self.hideBottomToolbar){ //enable zoom when not avatar
+    if (!self.hideBottomToolbar){ //enable zoom when not avatar
         _scrollView.maximumZoomScale = 0.95*minZoomScale;
         _scrollView.minimumZoomScale = 0.95*minZoomScale;
     }
@@ -643,6 +654,7 @@
             tool.singleToolEditMode = self.singleToolEditMode;
             tool.cropWidth = self.cropWidth;
             tool.cropHeight = self.cropHeight;
+            tool.chequeEditingMode = self.chequeEditingMode;
             self.currentTool = tool;
         }
     }

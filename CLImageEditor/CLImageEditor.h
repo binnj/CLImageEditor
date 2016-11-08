@@ -23,6 +23,7 @@
 @property (nonatomic, assign) UIInterfaceOrientationMask parentInterfaceOrientationMask; // NOTE: UI does NOT support Rotation!!
 @property (nonatomic, assign) NSNumber *cropWidth;
 @property (nonatomic, assign) NSNumber *cropHeight;
+@property (nonatomic, assign) BOOL chequeEditingMode;
 @property (nonatomic, assign) BOOL centreTopLevelTools;
 
 - (id)initWithImage:(UIImage*)image;
@@ -31,6 +32,7 @@
 
 - (void)showInViewController:(UIViewController<CLImageEditorTransitionDelegate>*)controller withImageView:(UIImageView*)imageView;
 - (void) presentCropOnlyInterfaceWithWidth:(NSNumber *)width andHeight:(NSNumber *)height;
+- (void) presentChequeCropOnlyInterface;
 
 @end
 
