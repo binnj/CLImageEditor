@@ -249,7 +249,7 @@
     [self initMenuScrollView];
     [self initImageScrollView];
     
-    [self setMenuView];
+    [self refreshToolSettings];
     
     if(_imageView==nil){
         _imageView = [UIImageView new];
@@ -267,6 +267,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
     if(self.targetImageView){
         [self expropriateImageView];
     }
@@ -452,8 +453,10 @@
 
 #pragma mark- 
 
-- (void)setMenuView
+- (void)refreshToolSettings
 {
+    for(UIView *sub in _menuView.subviews){ [sub removeFromSuperview]; }
+    
     CGFloat x = 0;
     CGFloat W = 70;
     CGFloat H = _menuView.height;
@@ -546,7 +549,11 @@
     return NO;
 }
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
 - (NSUInteger)supportedInterfaceOrientations
+#else
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+#endif
 {
     return (self.parentInterfaceOrientationMask != 0
             ? self.parentInterfaceOrientationMask

@@ -34,6 +34,8 @@
 - (void) presentCropOnlyInterfaceWithWidth:(NSNumber *)width andHeight:(NSNumber *)height;
 - (void) presentChequeCropOnlyInterface;
 
+- (void)refreshToolSettings;
+
 @end
 
 
