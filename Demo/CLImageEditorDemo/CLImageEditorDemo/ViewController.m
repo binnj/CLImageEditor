@@ -97,8 +97,9 @@
         activityView.excludedActivityTypes = excludedActivityTypes;
         activityView.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
             if(completed && [activityType isEqualToString:UIActivityTypeSaveToCameraRoll]){
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Saved successfully" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Saved successfully" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         };
         
@@ -135,7 +136,7 @@
 */
 #pragma mark- CLImageEditor delegate
 
-- (void)imageEditor:(CLImageEditor *)editor didFinishEdittingWithImage:(UIImage *)image
+- (void)imageEditor:(CLImageEditor *)editor didFinishEditingWithImage:(UIImage *)image
 {
     _imageView.image = image;
     [self refreshImageView];
