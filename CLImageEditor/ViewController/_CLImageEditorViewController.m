@@ -125,6 +125,47 @@
         }
         else{
             [self.view addSubview:navigationBar];
+            //Trailing
+            NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
+                                                      constraintWithItem:navigationBar
+                                                      attribute:NSLayoutAttributeTrailing
+                                                      relatedBy:NSLayoutRelationEqual
+                                                      toItem:self.view
+                                                      attribute:NSLayoutAttributeTrailing
+                                                      multiplier:1.0f
+                                                      constant:0.f];
+            //Leading
+            NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
+                                                     constraintWithItem:navigationBar
+                                                     attribute:NSLayoutAttributeLeading
+                                                     relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                     attribute:NSLayoutAttributeLeading
+                                                     multiplier:1.0f
+                                                     constant:0.f];
+            //Top
+            NSLayoutConstraint *topConstraint = [NSLayoutConstraint
+                                                 constraintWithItem:navigationBar
+                                                 attribute:NSLayoutAttributeTop
+                                                 relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view
+                                                 attribute:NSLayoutAttributeTop
+                                                 multiplier:1.0f
+                                                 constant:dy];
+            //Height
+            NSLayoutConstraint *heightConstraint = [NSLayoutConstraint
+                                                 constraintWithItem:navigationBar
+                                                 attribute:NSLayoutAttributeHeight
+                                                 relatedBy:NSLayoutRelationEqual
+                                                 toItem:nil
+                                                 attribute:NSLayoutAttributeNotAnAttribute
+                                                 multiplier:1.0f
+                                                 constant:44.f];
+            [self.view addConstraint:trailingConstraint];
+            [navigationBar addConstraint:heightConstraint];
+            [self.view addConstraint:topConstraint];
+            [self.view addConstraint:leadingConstraint];
+            navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
         }
         _navigationBar = navigationBar;
     }
@@ -154,15 +195,58 @@
         
         [self.view addSubview:menuScroll];
         self.menuView = menuScroll;
+        //Trailing
+        NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
+                                                  constraintWithItem:menuScroll
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  relatedBy:NSLayoutRelationEqual
+                                                  toItem:self.view
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  multiplier:1.0f
+                                                  constant:0.f];
+        //Leading
+        NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
+                                                 constraintWithItem:menuScroll
+                                                 attribute:NSLayoutAttributeLeading
+                                                 relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view
+                                                 attribute:NSLayoutAttributeLeading
+                                                 multiplier:1.0f
+                                                 constant:0.f];
+        //Bottom
+        NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint
+                                                constraintWithItem:menuScroll
+                                                attribute:NSLayoutAttributeBottom
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:self.view
+                                                attribute:NSLayoutAttributeBottom
+                                                multiplier:1.0f
+                                                constant:0.f];
+        //Height
+        NSLayoutConstraint *heightConstraint = [NSLayoutConstraint
+                                                constraintWithItem:menuScroll
+                                                attribute:NSLayoutAttributeHeight
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:nil
+                                                attribute:NSLayoutAttributeNotAnAttribute
+                                                multiplier:1.0f
+                                                constant:80.f];
+        [self.view addConstraint:trailingConstraint];
+        [menuScroll addConstraint:heightConstraint];
+        [self.view addConstraint:bottomConstraint];
+        [self.view addConstraint:leadingConstraint];
+        menuScroll.translatesAutoresizingMaskIntoConstraints = NO;
+
     }
-    self.menuView.backgroundColor = [CLImageEditorTheme toolbarColor];
+    self.menuView.backgroundColor = [UIColor redColor];//[CLImageEditorTheme toolbarColor];
 }
 
 - (void)initImageScrollView
 {
     if(_scrollView==nil){
+        
         UIScrollView *imageScroll = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-        imageScroll.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//        imageScroll.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         imageScroll.showsHorizontalScrollIndicator = NO;
         imageScroll.showsVerticalScrollIndicator = NO;
         imageScroll.delegate = self;
@@ -183,7 +267,51 @@
         imageScroll.height = self.view.height - imageScroll.top - _menuView.height;
         
         [self.view insertSubview:imageScroll atIndex:0];
+//        [self.view addSubview:imageScroll];
         _scrollView = imageScroll;
+        
+        //Trailing
+        NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
+                                                  constraintWithItem:imageScroll
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  relatedBy:NSLayoutRelationEqual
+                                                  toItem:self.view
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  multiplier:1.0f
+                                                  constant:-20.f];
+        //Leading
+        NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
+                                                 constraintWithItem:imageScroll
+                                                 attribute:NSLayoutAttributeLeading
+                                                 relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view
+                                                 attribute:NSLayoutAttributeLeading
+                                                 multiplier:1.0f
+                                                 constant:20.f];
+        //Top
+        NSLayoutConstraint *topConstraint = [NSLayoutConstraint
+                                                constraintWithItem:imageScroll
+                                                attribute:NSLayoutAttributeTop
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:self.view
+                                                attribute:NSLayoutAttributeTop
+                                                multiplier:1.0f
+                                                constant:y+20];
+        //Bottom
+        NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint
+                                                constraintWithItem:imageScroll
+                                                attribute:NSLayoutAttributeBottom
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:self.view
+                                                attribute:NSLayoutAttributeBottom
+                                                multiplier:1.0f
+                                                constant:-_menuView.height-20];
+        [self.view addConstraint:trailingConstraint];
+        [self.view addConstraint:topConstraint];
+        [self.view addConstraint:bottomConstraint];
+        [self.view addConstraint:leadingConstraint];
+        imageScroll.translatesAutoresizingMaskIntoConstraints = NO;
+        imageScroll.backgroundColor = [UIColor blueColor];
     }
 }
 
@@ -234,12 +362,12 @@
     
     self.title = self.toolInfo.title;
     self.view.clipsToBounds = YES;
-    self.view.backgroundColor = self.theme.backgroundColor;
+    self.view.backgroundColor = [UIColor greenColor];//self.theme.backgroundColor;
     self.navigationController.view.backgroundColor = self.view.backgroundColor;
     
-    if([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
+//    if([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
+//        self.automaticallyAdjustsScrollViewInsets = NO;
+//    }
     
     if([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]){
         self.navigationController.interactivePopGestureRecognizer.enabled = NO;
@@ -544,25 +672,36 @@
     return UIBarPositionTopAttached;
 }
 
-- (BOOL)shouldAutorotate
-{
-    return NO;
-}
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
-- (NSUInteger)supportedInterfaceOrientations
-#else
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-#endif
-{
-    return (self.parentInterfaceOrientationMask != 0
-            ? self.parentInterfaceOrientationMask
-            : UIInterfaceOrientationMaskPortrait);
-}
+//- (BOOL)shouldAutorotate
+//{
+//    return NO;
+//}
+//
+//#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
+//- (NSUInteger)supportedInterfaceOrientations
+//#else
+//- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+//#endif
+//{
+//    return (self.parentInterfaceOrientationMask != 0
+//            ? self.parentInterfaceOrientationMask
+//            : UIInterfaceOrientationMaskPortrait);
+//}
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return [[CLImageEditorTheme theme] statusBarStyle];
+}
+
+-(void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    [self resetImageViewFrame];
+    [self refreshToolSettings];
+
+//    [self resetZoomScaleWithAnimated:NO];
+
+    [self scrollViewDidZoom:_scrollView];
 }
 
 #pragma mark- Tool actions
