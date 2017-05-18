@@ -20,8 +20,6 @@ static const CGFloat kMenuBarHeight = 80.0f;
 @property (nonatomic, strong) CLImageToolBase *currentTool;
 @property (nonatomic, strong, readwrite) CLImageToolInfo *toolInfo;
 @property (nonatomic, strong) UIImageView *targetImageView;
-@property (nonatomic, assign) BOOL singleToolEditMode;
-@property (nonatomic, assign) BOOL hideBottomToolbar;
 
 @property (nonatomic, assign) NSNumber *cropWidth;
 @property (nonatomic, assign) NSNumber *cropHeight;
@@ -655,7 +653,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 #endif
 {
     return (_currentTool != nil
-            ? (UIInterfaceOrientationMask)self.interfaceOrientation
+            ? (UIInterfaceOrientationMask)[UIApplication sharedApplication].statusBarOrientation
             : (self.parentInterfaceOrientationMask != 0
                ? self.parentInterfaceOrientationMask
                : UIInterfaceOrientationMaskPortrait));

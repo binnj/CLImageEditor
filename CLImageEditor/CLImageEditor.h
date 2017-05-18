@@ -25,6 +25,8 @@
 @property (nonatomic, assign) NSNumber *cropHeight;
 @property (nonatomic, assign) BOOL chequeEditingMode;
 @property (nonatomic, assign) BOOL centreTopLevelTools;
+@property (nonatomic, assign) BOOL singleToolEditMode;
+@property (nonatomic, assign) BOOL hideBottomToolbar;
 
 - (id)initWithImage:(UIImage*)image;
 - (id)initWithImage:(UIImage*)image delegate:(id<CLImageEditorDelegate>)delegate;
