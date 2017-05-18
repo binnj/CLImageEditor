@@ -159,7 +159,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         self.menuView = menuScroll;
         [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(kMenuBarHeight) width:nil parent:self.view child:menuScroll peer:nil];
     }
-    self.menuView.backgroundColor = [UIColor redColor];//[CLImageEditorTheme toolbarColor];
+    self.menuView.backgroundColor = [CLImageEditorTheme toolbarColor];
 }
 
 +(NSArray <NSLayoutConstraint *>*)setConstraintsLeading:(NSNumber *)leading
@@ -333,7 +333,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
     
     self.title = self.toolInfo.title;
     self.view.clipsToBounds = YES;
-    self.view.backgroundColor = [UIColor greenColor];//self.theme.backgroundColor;
+    self.view.backgroundColor = self.theme.backgroundColor;
     self.navigationController.view.backgroundColor = self.view.backgroundColor;
     
 //    if([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
