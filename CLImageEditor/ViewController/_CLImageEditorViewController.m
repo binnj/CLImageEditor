@@ -13,6 +13,8 @@
 
 #pragma mark- _CLImageEditorViewController
 
+static const CGFloat kMenuBarHeight = 80.0f;
+
 @interface _CLImageEditorViewController()
 <CLImageToolProtocol, UINavigationBarDelegate>
 @property (nonatomic, strong) CLImageToolBase *currentTool;
@@ -125,47 +127,7 @@
         }
         else{
             [self.view addSubview:navigationBar];
-            //Trailing
-            NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
-                                                      constraintWithItem:navigationBar
-                                                      attribute:NSLayoutAttributeTrailing
-                                                      relatedBy:NSLayoutRelationEqual
-                                                      toItem:self.view
-                                                      attribute:NSLayoutAttributeTrailing
-                                                      multiplier:1.0f
-                                                      constant:0.f];
-            //Leading
-            NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
-                                                     constraintWithItem:navigationBar
-                                                     attribute:NSLayoutAttributeLeading
-                                                     relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
-                                                     attribute:NSLayoutAttributeLeading
-                                                     multiplier:1.0f
-                                                     constant:0.f];
-            //Top
-            NSLayoutConstraint *topConstraint = [NSLayoutConstraint
-                                                 constraintWithItem:navigationBar
-                                                 attribute:NSLayoutAttributeTop
-                                                 relatedBy:NSLayoutRelationEqual
-                                                 toItem:self.view
-                                                 attribute:NSLayoutAttributeTop
-                                                 multiplier:1.0f
-                                                 constant:dy];
-            //Height
-            NSLayoutConstraint *heightConstraint = [NSLayoutConstraint
-                                                 constraintWithItem:navigationBar
-                                                 attribute:NSLayoutAttributeHeight
-                                                 relatedBy:NSLayoutRelationEqual
-                                                 toItem:nil
-                                                 attribute:NSLayoutAttributeNotAnAttribute
-                                                 multiplier:1.0f
-                                                 constant:44.f];
-            [self.view addConstraint:trailingConstraint];
-            [navigationBar addConstraint:heightConstraint];
-            [self.view addConstraint:topConstraint];
-            [self.view addConstraint:leadingConstraint];
-            navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
+            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@44 parent:self.view child:navigationBar];
         }
         _navigationBar = navigationBar;
     }
@@ -187,7 +149,7 @@
 - (void)initMenuScrollView
 {
     if(self.menuView==nil && !self.hideBottomToolbar){
-        UIScrollView *menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 80)];
+        UIScrollView *menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, kMenuBarHeight)];
         menuScroll.top = self.view.height - menuScroll.height;
         menuScroll.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         menuScroll.showsHorizontalScrollIndicator = NO;
@@ -195,50 +157,87 @@
         
         [self.view addSubview:menuScroll];
         self.menuView = menuScroll;
-        //Trailing
-        NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
-                                                  constraintWithItem:menuScroll
-                                                  attribute:NSLayoutAttributeTrailing
-                                                  relatedBy:NSLayoutRelationEqual
-                                                  toItem:self.view
-                                                  attribute:NSLayoutAttributeTrailing
-                                                  multiplier:1.0f
-                                                  constant:0.f];
-        //Leading
-        NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
-                                                 constraintWithItem:menuScroll
-                                                 attribute:NSLayoutAttributeLeading
-                                                 relatedBy:NSLayoutRelationEqual
-                                                 toItem:self.view
-                                                 attribute:NSLayoutAttributeLeading
-                                                 multiplier:1.0f
-                                                 constant:0.f];
-        //Bottom
-        NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint
-                                                constraintWithItem:menuScroll
-                                                attribute:NSLayoutAttributeBottom
-                                                relatedBy:NSLayoutRelationEqual
-                                                toItem:self.view
-                                                attribute:NSLayoutAttributeBottom
-                                                multiplier:1.0f
-                                                constant:0.f];
-        //Height
-        NSLayoutConstraint *heightConstraint = [NSLayoutConstraint
-                                                constraintWithItem:menuScroll
-                                                attribute:NSLayoutAttributeHeight
-                                                relatedBy:NSLayoutRelationEqual
-                                                toItem:nil
-                                                attribute:NSLayoutAttributeNotAnAttribute
-                                                multiplier:1.0f
-                                                constant:80.f];
-        [self.view addConstraint:trailingConstraint];
-        [menuScroll addConstraint:heightConstraint];
-        [self.view addConstraint:bottomConstraint];
-        [self.view addConstraint:leadingConstraint];
-        menuScroll.translatesAutoresizingMaskIntoConstraints = NO;
-
+        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(kMenuBarHeight) parent:self.view child:menuScroll];
     }
     self.menuView.backgroundColor = [UIColor redColor];//[CLImageEditorTheme toolbarColor];
+}
+
++(NSArray <NSLayoutConstraint *>*)setConstraintsLeading:(NSNumber *)leading
+                                               trailing:(NSNumber *)trailing
+                                                    top:(NSNumber *)top
+                                                 bottom:(NSNumber *)bottom
+                                                 height:(NSNumber *)height
+                                                 parent:(UIView *)parent
+                                                  child:(UIView *)child
+{
+    NSMutableArray <NSLayoutConstraint *>*constraints = [NSMutableArray new];
+    //Trailing
+    if (trailing) {
+        NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
+                                                  constraintWithItem:child
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  relatedBy:NSLayoutRelationEqual
+                                                  toItem:parent
+                                                  attribute:NSLayoutAttributeTrailing
+                                                  multiplier:1.0f
+                                                  constant:trailing.floatValue];
+        [parent addConstraint:trailingConstraint];
+        [constraints addObject:trailingConstraint];
+    }
+    //Leading
+    if (leading) {
+        NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
+                                                 constraintWithItem:child
+                                                 attribute:NSLayoutAttributeLeading
+                                                 relatedBy:NSLayoutRelationEqual
+                                                 toItem:parent
+                                                 attribute:NSLayoutAttributeLeading
+                                                 multiplier:1.0f
+                                                 constant:leading.floatValue];
+        [parent addConstraint:leadingConstraint];
+        [constraints addObject:leadingConstraint];
+    }
+    //Bottom
+    if (bottom) {
+        NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint
+                                                constraintWithItem:child
+                                                attribute:NSLayoutAttributeBottom
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:parent
+                                                attribute:NSLayoutAttributeBottom
+                                                multiplier:1.0f
+                                                constant:bottom.floatValue];
+        [parent addConstraint:bottomConstraint];
+        [constraints addObject:bottomConstraint];
+    }
+    //Top
+    if (top) {
+        NSLayoutConstraint *topConstraint = [NSLayoutConstraint
+                                                constraintWithItem:child
+                                                attribute:NSLayoutAttributeTop
+                                                relatedBy:NSLayoutRelationEqual
+                                                toItem:parent
+                                                attribute:NSLayoutAttributeTop
+                                                multiplier:1.0f
+                                                constant:top.floatValue];
+        [parent addConstraint:topConstraint];
+        [constraints addObject:topConstraint];
+    }
+    //Height
+    if (height) {
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint
+                                            constraintWithItem:child
+                                            attribute:NSLayoutAttributeHeight
+                                            relatedBy:NSLayoutRelationEqual
+                                            toItem:nil
+                                            attribute:NSLayoutAttributeNotAnAttribute
+                                            multiplier:1.0f
+                                            constant:height.floatValue];
+        [child addConstraint:heightConstraint];
+        [constraints addObject:heightConstraint];
+    }
+    child.translatesAutoresizingMaskIntoConstraints = NO;
+    return constraints;
 }
 
 - (void)initImageScrollView
@@ -267,51 +266,8 @@
         imageScroll.height = self.view.height - imageScroll.top - _menuView.height;
         
         [self.view insertSubview:imageScroll atIndex:0];
-//        [self.view addSubview:imageScroll];
         _scrollView = imageScroll;
-        
-        //Trailing
-        NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint
-                                                  constraintWithItem:imageScroll
-                                                  attribute:NSLayoutAttributeTrailing
-                                                  relatedBy:NSLayoutRelationEqual
-                                                  toItem:self.view
-                                                  attribute:NSLayoutAttributeTrailing
-                                                  multiplier:1.0f
-                                                  constant:-20.f];
-        //Leading
-        NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint
-                                                 constraintWithItem:imageScroll
-                                                 attribute:NSLayoutAttributeLeading
-                                                 relatedBy:NSLayoutRelationEqual
-                                                 toItem:self.view
-                                                 attribute:NSLayoutAttributeLeading
-                                                 multiplier:1.0f
-                                                 constant:20.f];
-        //Top
-        NSLayoutConstraint *topConstraint = [NSLayoutConstraint
-                                                constraintWithItem:imageScroll
-                                                attribute:NSLayoutAttributeTop
-                                                relatedBy:NSLayoutRelationEqual
-                                                toItem:self.view
-                                                attribute:NSLayoutAttributeTop
-                                                multiplier:1.0f
-                                                constant:y+20];
-        //Bottom
-        NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint
-                                                constraintWithItem:imageScroll
-                                                attribute:NSLayoutAttributeBottom
-                                                relatedBy:NSLayoutRelationEqual
-                                                toItem:self.view
-                                                attribute:NSLayoutAttributeBottom
-                                                multiplier:1.0f
-                                                constant:-_menuView.height-20];
-        [self.view addConstraint:trailingConstraint];
-        [self.view addConstraint:topConstraint];
-        [self.view addConstraint:bottomConstraint];
-        [self.view addConstraint:leadingConstraint];
-        imageScroll.translatesAutoresizingMaskIntoConstraints = NO;
-        imageScroll.backgroundColor = [UIColor blueColor];
+        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(y) bottom:@(-_menuView.height) height:nil parent:self.view child:imageScroll];
     }
 }
 

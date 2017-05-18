@@ -27,4 +27,14 @@
 - (void)fixZoomScaleWithAnimated:(BOOL)animated;
 - (void)resetZoomScaleWithAnimated:(BOOL)animated;
 
+/**
+ *  Installs constraints on the parent and child, and returns the constraints if you need to remove them later
+ */
++(NSArray <NSLayoutConstraint *>*)setConstraintsLeading:(NSNumber *)leading
+                                               trailing:(NSNumber *)trailing
+                                                    top:(NSNumber *)top
+                                                 bottom:(NSNumber *)bottom
+                                                 height:(NSNumber *)height
+                                                 parent:(UIView *)parent
+                                                  child:(UIView *)child;
 @end
