@@ -127,7 +127,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         }
         else{
             [self.view addSubview:navigationBar];
-            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@44 parent:self.view child:navigationBar];
+            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@44 width:nil parent:self.view child:navigationBar peer:nil];
         }
         _navigationBar = navigationBar;
     }
@@ -157,7 +157,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         
         [self.view addSubview:menuScroll];
         self.menuView = menuScroll;
-        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(kMenuBarHeight) parent:self.view child:menuScroll];
+        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(kMenuBarHeight) width:nil parent:self.view child:menuScroll peer:nil];
     }
     self.menuView.backgroundColor = [UIColor redColor];//[CLImageEditorTheme toolbarColor];
 }
@@ -167,8 +167,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                                     top:(NSNumber *)top
                                                  bottom:(NSNumber *)bottom
                                                  height:(NSNumber *)height
+                                                  width:(NSNumber *)width
                                                  parent:(UIView *)parent
                                                   child:(UIView *)child
+                                                   peer:(UIView *)peer
 {
     NSMutableArray <NSLayoutConstraint *>*constraints = [NSMutableArray new];
     //Trailing
@@ -177,7 +179,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                                   constraintWithItem:child
                                                   attribute:NSLayoutAttributeTrailing
                                                   relatedBy:NSLayoutRelationEqual
-                                                  toItem:parent
+                                                  toItem:(peer ?: parent)
                                                   attribute:NSLayoutAttributeTrailing
                                                   multiplier:1.0f
                                                   constant:trailing.floatValue];
@@ -190,7 +192,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                                  constraintWithItem:child
                                                  attribute:NSLayoutAttributeLeading
                                                  relatedBy:NSLayoutRelationEqual
-                                                 toItem:parent
+                                                 toItem:(peer ?: parent)
                                                  attribute:NSLayoutAttributeLeading
                                                  multiplier:1.0f
                                                  constant:leading.floatValue];
@@ -203,7 +205,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                                 constraintWithItem:child
                                                 attribute:NSLayoutAttributeBottom
                                                 relatedBy:NSLayoutRelationEqual
-                                                toItem:parent
+                                                toItem:(peer ?: parent)
                                                 attribute:NSLayoutAttributeBottom
                                                 multiplier:1.0f
                                                 constant:bottom.floatValue];
@@ -216,7 +218,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                                 constraintWithItem:child
                                                 attribute:NSLayoutAttributeTop
                                                 relatedBy:NSLayoutRelationEqual
-                                                toItem:parent
+                                                toItem:(peer ?: parent)
                                                 attribute:NSLayoutAttributeTop
                                                 multiplier:1.0f
                                                 constant:top.floatValue];
@@ -235,6 +237,19 @@ static const CGFloat kMenuBarHeight = 80.0f;
                                             constant:height.floatValue];
         [child addConstraint:heightConstraint];
         [constraints addObject:heightConstraint];
+    }
+    //Width
+    if (width) {
+        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint
+                                               constraintWithItem:child
+                                               attribute:NSLayoutAttributeWidth
+                                               relatedBy:NSLayoutRelationEqual
+                                               toItem:nil
+                                               attribute:NSLayoutAttributeNotAnAttribute
+                                               multiplier:1.0f
+                                               constant:width.floatValue];
+        [child addConstraint:widthConstraint];
+        [constraints addObject:widthConstraint];
     }
     child.translatesAutoresizingMaskIntoConstraints = NO;
     return constraints;
@@ -267,7 +282,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         
         [self.view insertSubview:imageScroll atIndex:0];
         _scrollView = imageScroll;
-        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(y) bottom:@(-_menuView.height) height:nil parent:self.view child:imageScroll];
+        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(y) bottom:@(-_menuView.height) height:nil width:nil parent:self.view child:imageScroll peer:nil];
     }
 }
 
@@ -628,21 +643,23 @@ static const CGFloat kMenuBarHeight = 80.0f;
     return UIBarPositionTopAttached;
 }
 
-//- (BOOL)shouldAutorotate
-//{
-//    return NO;
-//}
-//
-//#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
-//- (NSUInteger)supportedInterfaceOrientations
-//#else
-//- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-//#endif
-//{
-//    return (self.parentInterfaceOrientationMask != 0
-//            ? self.parentInterfaceOrientationMask
-//            : UIInterfaceOrientationMaskPortrait);
-//}
+- (BOOL)shouldAutorotate
+{
+    return (_currentTool == nil);
+}
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
+- (NSUInteger)supportedInterfaceOrientations
+#else
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+#endif
+{
+    return (_currentTool != nil
+            ? (UIInterfaceOrientationMask)self.interfaceOrientation
+            : (self.parentInterfaceOrientationMask != 0
+               ? self.parentInterfaceOrientationMask
+               : UIInterfaceOrientationMaskPortrait));
+}
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {

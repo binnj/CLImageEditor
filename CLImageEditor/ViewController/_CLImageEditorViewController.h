@@ -35,6 +35,8 @@
                                                     top:(NSNumber *)top
                                                  bottom:(NSNumber *)bottom
                                                  height:(NSNumber *)height
+                                                  width:(NSNumber *)width
                                                  parent:(UIView *)parent
-                                                  child:(UIView *)child;
+                                                  child:(UIView *)child
+                                                   peer:(UIView *)peer;
 @end
