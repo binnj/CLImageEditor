@@ -36,7 +36,7 @@
     return [[_CLImageEditorViewController alloc] initWithDelegate:delegate];
 }
 
-- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView;
+- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView
 {
     
 }

@@ -8,6 +8,7 @@
 #import "_CLImageEditorViewController.h"
 
 #import "CLImageToolBase.h"
+#import "CLClippingTool.h"
 
 
 #pragma mark- _CLImageEditorViewController
@@ -20,6 +21,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
 @property (nonatomic, strong) CLImageToolBase *currentTool;
 @property (nonatomic, strong, readwrite) CLImageToolInfo *toolInfo;
 @property (nonatomic, strong) UIImageView *targetImageView;
+
+@property (nonatomic, assign) NSNumber *cropWidth;
+@property (nonatomic, assign) NSNumber *cropHeight;
+
 @end
 
 
@@ -81,6 +86,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (UIBarButtonItem*)createDoneButton
 {
+    CLImageEditorTheme *theme = [CLImageEditorTheme theme];
     UIBarButtonItem *rightBarButtonItem = nil;
     NSString *doneBtnTitle = [CLImageEditorTheme localizedString:@"CLImageEditor_DoneBtnTitle" withDefault:nil];
     
@@ -108,7 +114,17 @@ static const CGFloat kMenuBarHeight = 80.0f;
         UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, dy, self.view.width, kNavBarHeight)];
         [navigationBar pushNavigationItem:navigationItem animated:NO];
         navigationBar.delegate = self;
-        
+        navigationBar.barStyle = theme.navigationBarStyle;
+        if (theme.navigationBarBarTintColor) {
+            navigationBar.barTintColor = theme.navigationBarBarTintColor;
+        }
+        if (theme.navigationBarTintColor) {
+            navigationBar.tintColor = theme.navigationBarTintColor;
+        }
+        if (theme.navigationBarTitleTextAttributes) {
+            [navigationBar setTitleTextAttributes:theme.navigationBarTitleTextAttributes];
+        }
+
         if(self.navigationController){
             [self.navigationController.view addSubview:navigationBar];
             [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@(kNavBarHeight) width:nil parent:self.navigationController.view child:navigationBar peer:nil];
@@ -136,7 +152,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (void)initMenuScrollView
 {
-    if(self.menuView==nil){
+    if(self.menuView==nil && !self.hideBottomToolbar){
         UIScrollView *menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, kMenuBarHeight)];
         
         // Adjust for iPhone X
@@ -282,7 +298,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 #pragma mark-
 
-- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView;
+- (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView
 {
     _originalImage = imageView.image;
     
@@ -293,7 +309,34 @@ static const CGFloat kMenuBarHeight = 80.0f;
     
     self.view.frame = controller.view.bounds;
     [controller.view addSubview:self.view];
+    // SCC QQQ CHECK WTF
+    CGRect viewFrame = self.view.frame;
+    _navigationBar.frame = CGRectMake(0, 0, viewFrame.size.width, _navigationBar.bounds.size.height);
+    // SCC QQQ CHECK WTF
     [self refreshImageView];
+}
+
+- (void) presentCropOnlyInterfaceWithWidth:(NSNumber *)width andHeight:(NSNumber *)height
+{
+    self.singleToolEditMode = YES;
+    self.hideBottomToolbar = YES;
+    self.cropWidth = width;
+    self.cropHeight = height;
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
+}
+
+- (void) presentChequeCropOnlyInterface
+{
+    self.singleToolEditMode = YES;
+    self.chequeEditingMode = YES;
+    self.hideBottomToolbar = YES;
+    CLImageToolInfo *toolInfo = [self.toolInfo.subtools filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CLImageToolInfo *toolInfo, NSDictionary *bindings) {
+        return [@"CLClippingTool" isEqualToString:toolInfo.toolName];
+    }]].firstObject;
+    [self setupToolWithToolInfo:toolInfo];
 }
 
 - (void)viewDidLoad
@@ -305,10 +348,12 @@ static const CGFloat kMenuBarHeight = 80.0f;
     self.view.backgroundColor = self.theme.backgroundColor;
     self.navigationController.view.backgroundColor = self.view.backgroundColor;
     
+    // SCC QQQ CHECK WTF
     if([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
-    
+    // SCC QQQ CHECK WTF
+
     if([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]){
         self.navigationController.interactivePopGestureRecognizer.enabled = NO;
     }
@@ -552,6 +597,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
         x += W+padding;
     }
     _menuView.contentSize = CGSizeMake(MAX(x, _menuView.frame.size.width+1), 0);
+    if (self.centreTopLevelTools) {
+        _menuView.contentOffset = CGPointMake((x-_menuView.frame.size.width)/2.0f, 0.0f);
+        _menuView.scrollEnabled = NO;
+    }
 }
 
 - (void)resetImageViewFrame
@@ -569,8 +618,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
 - (void)fixZoomScaleWithAnimated:(BOOL)animated
 {
     CGFloat minZoomScale = _scrollView.minimumZoomScale;
-    _scrollView.maximumZoomScale = 0.95*minZoomScale;
-    _scrollView.minimumZoomScale = 0.95*minZoomScale;
+    if (!self.hideBottomToolbar){ //enable zoom when not avatar
+        _scrollView.maximumZoomScale = 0.95*minZoomScale;
+        _scrollView.minimumZoomScale = 0.95*minZoomScale;
+    }
     [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:animated];
 }
 
@@ -585,8 +636,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
     Rh = MAX(Rh, _imageView.image.size.height / (scale * _scrollView.frame.size.height));
     
     _scrollView.contentSize = _imageView.frame.size;
-    _scrollView.minimumZoomScale = 1;
-    _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
+    if (!self.hideBottomToolbar){//enable zoom when not avatar
+        _scrollView.minimumZoomScale = 1;
+        _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
+    }
     
     [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:animated];
 }
@@ -618,6 +671,14 @@ static const CGFloat kMenuBarHeight = 80.0f;
     return (_currentTool == nil
             ? UIInterfaceOrientationMaskAll
             : (UIInterfaceOrientationMask)[UIApplication sharedApplication].statusBarOrientation);
+  
+    // SCC QQQ WTF IS THIS NEEDED
+//    return (_currentTool != nil
+//            ? (UIInterfaceOrientationMask)[UIApplication sharedApplication].statusBarOrientation
+//            : (self.parentInterfaceOrientationMask != 0
+//               ? self.parentInterfaceOrientationMask
+//               : UIInterfaceOrientationMaskPortrait));
+    // SCC QQQ WTF IS THIS NEEDED
 }
 
 -(void)viewDidLayoutSubviews
@@ -700,9 +761,14 @@ static const CGFloat kMenuBarHeight = 80.0f;
     
     if(self.currentTool){
         UINavigationItem *item  = [[UINavigationItem alloc] initWithTitle:self.currentTool.toolInfo.title];
-        item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedDoneBtn:)];
-        item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_BackBtnTitle" withDefault:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(pushedCancelBtn:)];
-        
+        if (self.singleToolEditMode) {
+            item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedFinishBtn:)];
+            item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(pushedCloseBtn:)];
+        }
+        else {
+            item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_OKBtnTitle" withDefault:@"OK"] style:UIBarButtonItemStyleDone target:self action:@selector(pushedDoneBtn:)];
+            item.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:[CLImageEditorTheme localizedString:@"CLImageEditor_BackBtnTitle" withDefault:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(pushedCancelBtn:)];
+        }
         [_navigationBar pushNavigationItem:item animated:(self.navigationController==nil)];
     }
     else{
@@ -719,8 +785,13 @@ static const CGFloat kMenuBarHeight = 80.0f;
     if(toolClass){
         id instance = [toolClass alloc];
         if(instance!=nil && [instance isKindOfClass:[CLImageToolBase class]]){
-            instance = [instance initWithImageEditor:self withToolInfo:info];
-            self.currentTool = instance;
+            CLImageToolBase *tool = (CLImageToolBase *)instance;
+            tool = [tool initWithImageEditor:self withToolInfo:info];
+            tool.singleToolEditMode = self.singleToolEditMode;
+            tool.cropWidth = self.cropWidth;
+            tool.cropHeight = self.cropHeight;
+            tool.chequeEditingMode = self.chequeEditingMode;
+            self.currentTool = tool;
         }
     }
 }
@@ -786,6 +857,9 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (void)pushedFinishBtn:(id)sender
 {
+    if (self.singleToolEditMode) {
+        [self pushedDoneBtn:sender];
+    }
     if(self.targetImageView==nil){
         if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEditingWithImage:)]){
             [self.delegate imageEditor:self didFinishEditingWithImage:_originalImage];

@@ -20,12 +20,21 @@
 @property (nonatomic, weak) id<CLImageEditorDelegate> delegate;
 @property (nonatomic, readonly) CLImageEditorTheme *theme;
 @property (nonatomic, readonly) CLImageToolInfo *toolInfo;
+@property (nonatomic, assign) UIInterfaceOrientationMask parentInterfaceOrientationMask; // NOTE: UI does NOT support Rotation!!
+@property (nonatomic, assign) NSNumber *cropWidth;
+@property (nonatomic, assign) NSNumber *cropHeight;
+@property (nonatomic, assign) BOOL chequeEditingMode;
+@property (nonatomic, assign) BOOL centreTopLevelTools;
+@property (nonatomic, assign) BOOL singleToolEditMode;
+@property (nonatomic, assign) BOOL hideBottomToolbar;
 
 - (id)initWithImage:(UIImage*)image;
 - (id)initWithImage:(UIImage*)image delegate:(id<CLImageEditorDelegate>)delegate;
 - (id)initWithDelegate:(id<CLImageEditorDelegate>)delegate;
 
 - (void)showInViewController:(UIViewController<CLImageEditorTransitionDelegate>*)controller withImageView:(UIImageView*)imageView;
+- (void) presentCropOnlyInterfaceWithWidth:(NSNumber *)width andHeight:(NSNumber *)height;
+- (void) presentChequeCropOnlyInterface;
 
 - (void)refreshToolSettings;
 

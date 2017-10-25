@@ -6,7 +6,7 @@
 //
 
 #import "CLClippingTool.h"
-
+#import "CLImageEditorTheme.h"
 
 static NSString* const kCLClippingToolRatios = @"ratios";
 static NSString* const kCLClippingToolSwapButtonHidden = @"swapButtonHidden";
@@ -36,6 +36,9 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @interface CLClippingPanel : UIView
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) CLRatio *clippingRatio;
+@property (nonatomic, assign) NSNumber *cropWidth;
+@property (nonatomic, assign) NSNumber *cropHeight;
+@property (nonatomic, assign) BOOL chequeEditingMode;
 - (id)initWithSuperview:(UIView*)superview frame:(CGRect)frame;
 - (void)setBgColor:(UIColor*)bgColor;
 - (void)setGridColor:(UIColor*)gridColor;
@@ -103,32 +106,47 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     if(!self.toolInfo.optionalInfo){
         self.toolInfo.optionalInfo = [[self.class optionalInfo] mutableCopy];
     }
+    if (self.cropWidth && self.cropHeight) {
+        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:self.cropWidth, kCLClippingToolRatioValue2:self.cropHeight, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
+        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
+    }
+    else if (self.chequeEditingMode){
+        self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@458, kCLClippingToolRatioValue2:@197, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
+        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
+    }
     
-    BOOL swapBtnHidden = [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
+    BOOL swapBtnHidden = (self.cropHeight && self.cropWidth) || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
     CGFloat buttonWidth = (swapBtnHidden) ? 0 : 70;
     
+    if (self.singleToolEditMode && self.cropWidth && self.cropHeight && ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count == 1) {
+        CGRect frame = self.editor.menuView.frame;
+        self.editor.menuView.frame = CGRectMake(frame.origin.x,frame.origin.y+frame.size.height,frame.size.width,0);
+    }
     _menuContainer = [[UIView alloc] initWithFrame:self.editor.menuView.frame];
     _menuContainer.backgroundColor = self.editor.menuView.backgroundColor;
     [self.editor.view addSubview:_menuContainer];
     
-    _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
-    _menuScroll.backgroundColor = [UIColor clearColor];
-    _menuScroll.showsHorizontalScrollIndicator = NO;
-    _menuScroll.clipsToBounds = NO;
-    [_menuContainer addSubview:_menuScroll];
-    
-    if(!swapBtnHidden){
-        UIView *btnPanel = [[UIView alloc] initWithFrame:CGRectMake(_menuScroll.right, 0, buttonWidth, _menuContainer.height)];
-        btnPanel.backgroundColor = [_menuContainer.backgroundColor colorWithAlphaComponent:0.9];
-        [_menuContainer addSubview:btnPanel];
+    if ((!self.cropWidth && !self.cropHeight) ||  ((NSArray *)self.toolInfo.optionalInfo[kCLClippingToolRatios]).count > 1) {
         
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn.frame = CGRectMake(0, 0, 40, 40);
-        btn.center = CGPointMake(btnPanel.width/2, btnPanel.height/2 - 10);
-        [btn addTarget:self action:@selector(pushedRotateBtn:) forControlEvents:UIControlEventTouchUpInside];
-        [btn setImage:[self imageForKey:kCLClippingToolRotateIconName defaultImageName:@"btn_rotate.png"] forState:UIControlStateNormal];
-        btn.adjustsImageWhenHighlighted = YES;
-        [btnPanel addSubview:btn];
+        _menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _menuContainer.width - buttonWidth, _menuContainer.height)];
+        _menuScroll.backgroundColor = [UIColor clearColor];
+        _menuScroll.showsHorizontalScrollIndicator = NO;
+        _menuScroll.clipsToBounds = NO;
+        [_menuContainer addSubview:_menuScroll];
+        
+        if(!swapBtnHidden){
+            UIView *btnPanel = [[UIView alloc] initWithFrame:CGRectMake(_menuScroll.right, 0, buttonWidth, _menuContainer.height)];
+            btnPanel.backgroundColor = [_menuContainer.backgroundColor colorWithAlphaComponent:0.9];
+            [_menuContainer addSubview:btnPanel];
+            
+            UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+            btn.frame = CGRectMake(0, 0, 40, 40);
+            btn.center = CGPointMake(btnPanel.width/2, btnPanel.height/2 - 10);
+            [btn addTarget:self action:@selector(pushedRotateBtn:) forControlEvents:UIControlEventTouchUpInside];
+            [btn setImage:[self imageForKey:kCLClippingToolRotateIconName defaultImageName:@"btn_rotate.png"] forState:UIControlStateNormal];
+            btn.adjustsImageWhenHighlighted = YES;
+            [btnPanel addSubview:btn];
+        }
     }
     
     _gridView = [[CLClippingPanel alloc] initWithSuperview:self.editor.imageView.superview frame:self.editor.imageView.frame];
@@ -136,6 +154,9 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     _gridView.bgColor = [self.editor.view.backgroundColor colorWithAlphaComponent:0.8];
     _gridView.gridColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
     _gridView.clipsToBounds = NO;
+    _gridView.cropWidth = self.cropWidth;
+    _gridView.cropHeight = self.cropHeight;
+    _gridView.chequeEditingMode = self.chequeEditingMode;
     
     [self setCropMenu];
     
@@ -293,6 +314,8 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, strong) UIColor *gridColor;
+@property (nonatomic, assign) BOOL avatarEditingMode;
+
 @end
 
 @implementation CLGridLayar
@@ -322,7 +345,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
     CGContextFillRect(context, rct);
     
-    CGContextClearRect(context, _clippingRect);
+    CGContextClearRect(context, _clippingRect);    
     
     CGContextSetStrokeColorWithColor(context, self.gridColor.CGColor);
     CGContextSetLineWidth(context, 1);
@@ -344,6 +367,14 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
         dW += rct.size.height/3;
     }
     CGContextStrokePath(context);
+    
+    if (self.avatarEditingMode) {
+        CGContextSetStrokeColorWithColor(context, [CLImageEditorTheme theme].avatarCircleColor.CGColor);
+        CGContextSetLineWidth(context, 3);
+        CGContextBeginPath(context);
+        CGContextAddEllipseInRect(context, rct);
+        CGContextStrokePath(context);
+    }
 }
 
 @end
@@ -407,6 +438,11 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     [_rbView removeFromSuperview];
 }
 
+- (void) setChequeEditingMode:(BOOL)chequeEditingMode
+{
+    _chequeEditingMode = chequeEditingMode;
+}
+
 - (void)setBgColor:(UIColor *)bgColor
 {
     _gridLayer.bgColor = bgColor;
@@ -462,6 +498,7 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
 {
     CGRect rect = self.bounds;
     if(self.clippingRatio){
+        _gridLayer.avatarEditingMode = (self.clippingRatio.ratio == 1.0f);
         CGFloat H = rect.size.width * self.clippingRatio.ratio;
         if(H<=rect.size.height){
             rect.size.height = H;
