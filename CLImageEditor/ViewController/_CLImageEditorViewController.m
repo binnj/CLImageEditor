@@ -671,14 +671,6 @@ static const CGFloat kMenuBarHeight = 80.0f;
     return (_currentTool == nil
             ? UIInterfaceOrientationMaskAll
             : (UIInterfaceOrientationMask)[UIApplication sharedApplication].statusBarOrientation);
-  
-    // SCC QQQ WTF IS THIS NEEDED
-//    return (_currentTool != nil
-//            ? (UIInterfaceOrientationMask)[UIApplication sharedApplication].statusBarOrientation
-//            : (self.parentInterfaceOrientationMask != 0
-//               ? self.parentInterfaceOrientationMask
-//               : UIInterfaceOrientationMaskPortrait));
-    // SCC QQQ WTF IS THIS NEEDED
 }
 
 -(void)viewDidLayoutSubviews
