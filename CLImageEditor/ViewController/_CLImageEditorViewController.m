@@ -309,10 +309,9 @@ static const CGFloat kMenuBarHeight = 80.0f;
     
     self.view.frame = controller.view.bounds;
     [controller.view addSubview:self.view];
-    // SCC QQQ CHECK WTF
+    // SCC: Not quite sure if next two lines are still necessary, but don't currently seem to 'hurt'
     CGRect viewFrame = self.view.frame;
     _navigationBar.frame = CGRectMake(0, 0, viewFrame.size.width, _navigationBar.bounds.size.height);
-    // SCC QQQ CHECK WTF
     [self refreshImageView];
 }
 
@@ -348,11 +347,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
     self.view.backgroundColor = self.theme.backgroundColor;
     self.navigationController.view.backgroundColor = self.view.backgroundColor;
     
-    // SCC QQQ CHECK WTF
+    // SCC: Not sure if next if chunk that says NO for scroll view insets is needed...
     if([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
-    // SCC QQQ CHECK WTF
 
     if([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]){
         self.navigationController.interactivePopGestureRecognizer.enabled = NO;

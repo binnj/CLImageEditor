@@ -9,8 +9,10 @@
 
 #import "UIView+Frame.h"
 #import "CLPickerView.h"
+#import "CLImageEditorTheme.h"
 
 const CGFloat kCLFontPickerViewConstantFontSize = 14;
+static UIFont *systemFont = nil;
 
 @interface CLFontPickerView()
 <CLPickerViewDelegate, CLPickerViewDataSource>
@@ -19,6 +21,14 @@ const CGFloat kCLFontPickerViewConstantFontSize = 14;
 @implementation CLFontPickerView
 {
     CLPickerView *_pickerView;
+}
+
++ (void)initialize
+{
+    if (self == [CLFontPickerView class]) {
+        // We grab a system font reference for adding to the list and later comparison for sane display names
+        systemFont = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+    }
 }
 
 + (NSArray*)allFontList
@@ -30,6 +40,9 @@ const CGFloat kCLFontPickerViewConstantFontSize = 14;
             [list addObject:[UIFont fontWithName:fontName size:kCLFontPickerViewConstantFontSize]];
         }
     }
+
+    // always add in the system font
+    [list addObject:systemFont];
     
     return [list sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"fontName" ascending:YES]]];
 }
@@ -187,7 +200,13 @@ const CGFloat kCLFontPickerViewConstantFontSize = 14;
                 lbl.text = self.text;
             }
             else{
-                lbl.text = [NSString stringWithFormat:@"%@", lbl.font.fontName];
+                // Use a nice display IF we are the system font..
+                NSString *fontName = [NSString stringWithFormat:@"%@", lbl.font.fontName];
+                // checking against the system font so we don't display ".SFUIText" jeez
+                if ([systemFont.fontName isEqualToString:fontName]) {
+                    fontName = [CLImageEditorTheme localizedString:@"system_font_name" withDefault:@"System"];
+                }
+                lbl.text = fontName;
             }
             break;
         case 1:

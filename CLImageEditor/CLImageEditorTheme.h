@@ -34,6 +34,8 @@
 @property (nonatomic, strong) UIColor  *avatarCircleColor;
 
 + (CLImageEditorTheme*)theme;
+/// Handy look-in-the-app-then-bundle decoding.
++ (NSString*)localizedString:(NSString*)key withDefault:defaultValue;
 
 @end
 

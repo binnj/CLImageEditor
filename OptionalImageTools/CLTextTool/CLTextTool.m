@@ -25,6 +25,7 @@ static NSString* const kCLTextToolFontIconName = @"fontIconAssetsName";
 static NSString* const kCLTextToolAlignLeftIconName = @"alignLeftIconAssetsName";
 static NSString* const kCLTextToolAlignCenterIconName = @"alignCenterIconAssetsName";
 static NSString* const kCLTextToolAlignRightIconName = @"alignRightIconAssetsName";
+static NSString* const kCLTextToolUseDefaultSystemFont = @"useDefaultSystemFont";
 
 
 @interface _CLTextView : UIView
@@ -101,6 +102,7 @@ static NSString* const kCLTextToolAlignRightIconName = @"alignRightIconAssetsNam
              kCLTextToolAlignLeftIconName:@"",
              kCLTextToolAlignCenterIconName:@"",
              kCLTextToolAlignRightIconName:@"",
+             kCLTextToolUseDefaultSystemFont:@(NO),
              };
 }
 
@@ -130,7 +132,16 @@ static NSString* const kCLTextToolAlignRightIconName = @"alignRightIconAssetsNam
     _settingView.backgroundColor = [CLImageEditorTheme toolbarColor];
     _settingView.textColor = [CLImageEditorTheme toolbarTextColor];
     _settingView.fontPickerForegroundColor = _settingView.backgroundColor;
+    // Check for whether the system default font should be used
+    if (self.toolInfo &&
+        self.toolInfo.optionalInfo &&
+        self.toolInfo.optionalInfo[kCLTextToolUseDefaultSystemFont] &&
+        ((NSNumber *)self.toolInfo.optionalInfo[kCLTextToolUseDefaultSystemFont]).boolValue) {
+        UIFont *font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+        _settingView.selectedFont = font;
+    }
     _settingView.delegate = self;
+    
     [self.editor.view addSubview:_settingView];
     
     UIButton *okButton = [UIButton buttonWithType:UIButtonTypeCustom];
