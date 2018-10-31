@@ -108,11 +108,11 @@ static NSString* const kCLClippingToolRatioTitleFormat = @"titleFormat";
     }
     if (self.cropWidth && self.cropHeight) {
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:self.cropWidth, kCLClippingToolRatioValue2:self.cropHeight, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
-        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
+        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation));
     }
     else if (self.chequeEditingMode){
         self.toolInfo.optionalInfo[kCLClippingToolRatios] = @[@{kCLClippingToolRatioValue1:@458, kCLClippingToolRatioValue2:@197, kCLClippingToolRatioTitleFormat:@"%g : %g"}];
-        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation));
+        self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] = @(!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation));
     }
     
     BOOL swapBtnHidden = (self.cropHeight && self.cropWidth) || [self.toolInfo.optionalInfo[kCLClippingToolSwapButtonHidden] boolValue];
