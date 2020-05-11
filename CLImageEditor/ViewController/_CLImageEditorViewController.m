@@ -86,7 +86,6 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (UIBarButtonItem*)createDoneButton
 {
-    CLImageEditorTheme *theme = [CLImageEditorTheme theme];
     UIBarButtonItem *rightBarButtonItem = nil;
     NSString *doneBtnTitle = [CLImageEditorTheme localizedString:@"CLImageEditor_DoneBtnTitle" withDefault:nil];
     
@@ -101,6 +100,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (void)initNavigationBar
 {
+    CLImageEditorTheme *theme = [CLImageEditorTheme theme];
     self.navigationItem.rightBarButtonItem = [self createDoneButton];
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     
