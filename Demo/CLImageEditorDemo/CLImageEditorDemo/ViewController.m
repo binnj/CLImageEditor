@@ -19,7 +19,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	
+    
+    UIView *contentView = [UIView new];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"default.jpg"]];
+    [contentView addSubview:imageView];
+    [_scrollView addSubview:contentView];
+    _imageView = imageView;
+    
     //Set a black theme rather than a white one
 	/*
     [[CLImageEditorTheme theme] setBackgroundColor:[UIColor blackColor]];
@@ -30,6 +36,11 @@
     [[UINavigationBar appearance] setBarStyle:UIBarStyleBlack];
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     */
+}
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
     [self refreshImageView];
 }
 

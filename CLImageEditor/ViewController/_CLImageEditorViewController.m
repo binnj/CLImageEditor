@@ -13,6 +13,7 @@
 
 #pragma mark- _CLImageEditorViewController
 
+static const CGFloat kNavBarHeight = 44.0f;
 static const CGFloat kMenuBarHeight = 80.0f;
 
 @interface _CLImageEditorViewController()
@@ -83,7 +84,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 #pragma mark- Custom initialization
 
-- (void)initNavigationBar
+- (UIBarButtonItem*)createDoneButton
 {
     CLImageEditorTheme *theme = [CLImageEditorTheme theme];
     UIBarButtonItem *rightBarButtonItem = nil;
@@ -95,18 +96,22 @@ static const CGFloat kMenuBarHeight = 80.0f;
     else{
         rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(pushedFinishBtn:)];
     }
-    
-    self.navigationItem.rightBarButtonItem = rightBarButtonItem;
+    return rightBarButtonItem;
+}
+
+- (void)initNavigationBar
+{
+    self.navigationItem.rightBarButtonItem = [self createDoneButton];
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     
     if(_navigationBar==nil){
         UINavigationItem *navigationItem  = [[UINavigationItem alloc] init];
         navigationItem.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(pushedCloseBtn:)];
-        navigationItem.rightBarButtonItem = rightBarButtonItem;
+        navigationItem.rightBarButtonItem = [self createDoneButton];
         
-        CGFloat dy = ([UIDevice iosVersion]<7) ? 0 : MIN([UIApplication sharedApplication].statusBarFrame.size.height, [UIApplication sharedApplication].statusBarFrame.size.width);
+        CGFloat dy = MIN([UIApplication sharedApplication].statusBarFrame.size.height, [UIApplication sharedApplication].statusBarFrame.size.width);
         
-        UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, dy, self.view.width, 44)];
+        UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, dy, self.view.width, kNavBarHeight)];
         [navigationBar pushNavigationItem:navigationItem animated:NO];
         navigationBar.delegate = self;
         navigationBar.barStyle = theme.navigationBarStyle;
@@ -122,10 +127,16 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
         if(self.navigationController){
             [self.navigationController.view addSubview:navigationBar];
+            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:nil height:@(kNavBarHeight) width:nil parent:self.navigationController.view child:navigationBar peer:nil];
         }
         else{
             [self.view addSubview:navigationBar];
-            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@44 width:nil parent:self.view child:navigationBar peer:nil];
+            if (@available(iOS 11.0, *)) {
+                [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:nil height:@(kNavBarHeight) width:nil parent:self.view child:navigationBar peer:nil];
+                [_CLImageEditorViewController setConstraintsLeading:nil trailing:nil top:@0 bottom:nil height:nil width:nil parent:self.view child:navigationBar peer:self.view.safeAreaLayoutGuide];
+            } else {
+                [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(dy) bottom:nil height:@(kNavBarHeight) width:nil parent:self.view child:navigationBar peer:nil];
+            }
         }
         _navigationBar = navigationBar;
     }
@@ -146,8 +157,15 @@ static const CGFloat kMenuBarHeight = 80.0f;
 
 - (void)initMenuScrollView
 {
-    if(self.menuView==nil && !self.hideBottomToolbar){
+    if(self.menuView==nil){
         UIScrollView *menuScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, kMenuBarHeight)];
+        
+        // Adjust for iPhone X
+        if (@available(iOS 11.0, *)) {
+            UIEdgeInsets theInsets = [UIApplication sharedApplication].keyWindow.rootViewController.view.safeAreaInsets;
+            menuScroll.height += theInsets.bottom;
+        }
+        
         menuScroll.top = self.view.height - menuScroll.height;
         menuScroll.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         menuScroll.showsHorizontalScrollIndicator = NO;
@@ -155,7 +173,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         
         [self.view addSubview:menuScroll];
         self.menuView = menuScroll;
-        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(kMenuBarHeight) width:nil parent:self.view child:menuScroll peer:nil];
+        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@0 height:@(menuScroll.height) width:nil parent:self.view child:menuScroll peer:nil];
     }
     self.menuView.backgroundColor = [CLImageEditorTheme toolbarColor];
 }
@@ -280,7 +298,15 @@ static const CGFloat kMenuBarHeight = 80.0f;
         
         [self.view insertSubview:imageScroll atIndex:0];
         _scrollView = imageScroll;
-        [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(y) bottom:@(-_menuView.height) height:nil width:nil parent:self.view child:imageScroll peer:nil];
+        
+        if (@available(iOS 11.0, *)) {
+            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:nil bottom:@(-_menuView.height) height:nil width:nil parent:self.view child:imageScroll peer:nil];
+            [_CLImageEditorViewController setConstraintsLeading:nil trailing:nil top:@(y) bottom:nil height:nil width:nil parent:self.view child:imageScroll peer:self.view.safeAreaLayoutGuide];
+        }
+        else{
+            [_CLImageEditorViewController setConstraintsLeading:@0 trailing:@0 top:@(y) bottom:@(-_menuView.height) height:nil width:nil parent:self.view child:imageScroll peer:nil];
+        }
+        
     }
 }
 
@@ -416,21 +442,21 @@ static const CGFloat kMenuBarHeight = 80.0f;
                          
                          CGFloat dy = ([UIDevice iosVersion]<7) ? [UIApplication sharedApplication].statusBarFrame.size.height : 0;
                          
-                         CGSize size = (_imageView.image) ? _imageView.image.size : _imageView.frame.size;
+                         CGSize size = (self->_imageView.image) ? self->_imageView.image.size : self->_imageView.frame.size;
                          if(size.width>0 && size.height>0){
-                             CGFloat ratio = MIN(_scrollView.width / size.width, _scrollView.height / size.height);
+                             CGFloat ratio = MIN(self->_scrollView.width / size.width, self->_scrollView.height / size.height);
                              CGFloat W = ratio * size.width;
                              CGFloat H = ratio * size.height;
-                             animateView.frame = CGRectMake((_scrollView.width-W)/2 + _scrollView.left, (_scrollView.height-H)/2 + _scrollView.top + dy, W, H);
+                             animateView.frame = CGRectMake((self->_scrollView.width-W)/2 + self->_scrollView.left, (self->_scrollView.height-H)/2 + self->_scrollView.top + dy, W, H);
                          }
                          
-                         _bgView.alpha = 1;
-                         _navigationBar.transform = CGAffineTransformIdentity;
-                         _menuView.transform = CGAffineTransformIdentity;
+                         self->_bgView.alpha = 1;
+                         self->_navigationBar.transform = CGAffineTransformIdentity;
+                         self->_menuView.transform = CGAffineTransformIdentity;
                      }
                      completion:^(BOOL finished) {
                          self.targetImageView.hidden = NO;
-                         _imageView.hidden = NO;
+                         self->_imageView.hidden = NO;
                          [animateView removeFromSuperview];
                      }
      ];
@@ -467,25 +493,25 @@ static const CGFloat kMenuBarHeight = 80.0f;
     
     [UIView animateWithDuration:0.3
                      animations:^{
-                         _bgView.alpha = 0;
-                         _menuView.alpha = 0;
-                         _navigationBar.alpha = 0;
+                         self->_bgView.alpha = 0;
+                         self->_menuView.alpha = 0;
+                         self->_navigationBar.alpha = 0;
                          
-                         _menuView.transform = CGAffineTransformMakeTranslation(0, self.view.height-_menuView.top);
-                         _navigationBar.transform = CGAffineTransformMakeTranslation(0, -_navigationBar.height);
+                         self->_menuView.transform = CGAffineTransformMakeTranslation(0, self.view.height-self->_menuView.top);
+                         self->_navigationBar.transform = CGAffineTransformMakeTranslation(0, -self->_navigationBar.height);
                          
                          [self copyImageViewInfo:self.targetImageView toView:animateView];
                      }
                      completion:^(BOOL finished) {
                          [animateView removeFromSuperview];
-                         [_menuView removeFromSuperview];
-                         [_navigationBar removeFromSuperview];
+                         [self->_menuView removeFromSuperview];
+                         [self->_navigationBar removeFromSuperview];
                          
                          [self willMoveToParentViewController:nil];
                          [self.view removeFromSuperview];
                          [self removeFromParentViewController];
                          
-                         _imageView.hidden = NO;
+                         self->_imageView.hidden = NO;
                          self.targetImageView.hidden = NO;
                          
                          if([delegate respondsToSelector:@selector(imageEditor:didDismissWithImageView:canceled:)]){
@@ -548,7 +574,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
     return nil;
 }
 
-#pragma mark- 
+#pragma mark-
 
 - (void)refreshToolSettings
 {
@@ -659,6 +685,11 @@ static const CGFloat kMenuBarHeight = 80.0f;
                : UIInterfaceOrientationMaskPortrait));
 }
 
+- (BOOL)prefersStatusBarHidden
+{
+    return [[CLImageEditorTheme theme] statusBarHidden];
+}
+
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return [[CLImageEditorTheme theme] statusBarStyle];
@@ -695,10 +726,10 @@ static const CGFloat kMenuBarHeight = 80.0f;
     [UIView animateWithDuration:kCLImageToolAnimationDuration
                      animations:^{
                          if(editing){
-                             _menuView.transform = CGAffineTransformMakeTranslation(0, self.view.height-_menuView.top);
+                             self->_menuView.transform = CGAffineTransformMakeTranslation(0, self.view.height-self->_menuView.top);
                          }
                          else{
-                             _menuView.transform = CGAffineTransformIdentity;
+                             self->_menuView.transform = CGAffineTransformIdentity;
                          }
                      }
      ];
@@ -717,7 +748,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         [UIView animateWithDuration:kCLImageToolAnimationDuration
                          animations:^{
                              self.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, -self.navigationController.navigationBar.height-20);
-                             _navigationBar.transform = CGAffineTransformIdentity;
+                             self->_navigationBar.transform = CGAffineTransformIdentity;
                          }
          ];
     }
@@ -725,11 +756,11 @@ static const CGFloat kMenuBarHeight = 80.0f;
         [UIView animateWithDuration:kCLImageToolAnimationDuration
                          animations:^{
                              self.navigationController.navigationBar.transform = CGAffineTransformIdentity;
-                             _navigationBar.transform = CGAffineTransformMakeTranslation(0, -_navigationBar.height);
+                             self->_navigationBar.transform = CGAffineTransformMakeTranslation(0, -self->_navigationBar.height);
                          }
                          completion:^(BOOL finished) {
-                             _navigationBar.hidden = YES;
-                             _navigationBar.transform = CGAffineTransformIdentity;
+                             self->_navigationBar.hidden = YES;
+                             self->_navigationBar.transform = CGAffineTransformIdentity;
                          }
          ];
     }
@@ -810,8 +841,8 @@ static const CGFloat kMenuBarHeight = 80.0f;
             [self presentViewController:alert animated:YES completion:nil];
         }
         else if(image){
-            _originalImage = image;
-            _imageView.image = image;
+            self->_originalImage = image;
+            self->_imageView.image = image;
             
             [self resetImageViewFrame];
             self.currentTool = nil;
