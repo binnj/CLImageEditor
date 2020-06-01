@@ -1,20 +1,20 @@
-﻿/* No comment provided by engineer. */
+/* No comment provided by engineer. */
 "CLAdjustmentTool_DefaultTitle" = "ajustement";
 
 /* No comment provided by engineer. */
 "CLBloomEffect_DefaultTitle" = "Bloom";
 
 /* No comment provided by engineer. */
-"CLBlurEffect_DefaultTitle" = "Blur & Focus";
+"CLBlurEffect_DefaultTitle" = "Brouiller";
 
 /* No comment provided by engineer. */
-"CLBlurEffect_MenuItemBand" = "Band";
+"CLBlurEffect_MenuItemBand" = "Bande";
 
 /* No comment provided by engineer. */
-"CLBlurEffect_MenuItemCircle" = "Circle";
+"CLBlurEffect_MenuItemCircle" = "Cercle";
 
 /* No comment provided by engineer. */
-"CLBlurEffect_MenuItemNormal" = "Normal";
+"CLBlurEffect_MenuItemNormal" = "Ordinaire";
 
 /* No comment provided by engineer. */
 "CLClippingTool_DefaultTitle" = "Rogner";
@@ -65,7 +65,7 @@
 "CLDefaultVignetteFilter_DefaultTitle" = "Vignette";
 
 /* No comment provided by engineer. */
-"CLDrawTool_DefaultTitle" = "Draw";
+"CLDrawTool_DefaultTitle" = "Dessiner";
 
 /* No comment provided by engineer. */
 "CLEffectBase_DefaultTitle" = "Aucun";
