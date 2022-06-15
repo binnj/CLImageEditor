@@ -1,5 +1,5 @@
 /* No comment provided by engineer. */
-"CLAdjustmentTool_DefaultTitle" = "Ajuste";
+"CLAdjustmentTool_DefaultTitle" = "Ajustar";
 
 /* No comment provided by engineer. */
 "CLBloomEffect_DefaultTitle" = "Florecer";
@@ -17,7 +17,7 @@
 "CLBlurEffect_MenuItemNormal" = "Normal";
 
 /* No comment provided by engineer. */
-"CLClippingTool_DefaultTitle" = "Cultivo";
+"CLClippingTool_DefaultTitle" = "Cortar";
 
 /* No comment provided by engineer. */
 "CLClippingTool_ItemMenuCustom" = "Personalizado";
@@ -95,7 +95,7 @@
 "CLImageEditor_OKBtnTitle" = "OK";
 
 /* No comment provided by engineer. */
-"CLImageEditor_DoneBtnTitle" = "Hecho";
+"CLImageEditor_DoneBtnTitle" = "Listo";
 
 /* No comment provided by engineer. */
 "CLPixellateEffect_DefaultTitle" = "Pixelizar";
@@ -164,5 +164,5 @@
 "CLTextTool_MenuItemText" = "Texto";
 
 /* No comment provided by engineer. */
-"CLToneCurveTool_DefaultTitle" = "Curva de Tonos";
+"CLToneCurveTool_DefaultTitle" = "Tonalidad";
 
